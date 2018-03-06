@@ -2,28 +2,43 @@ package Main;
 
 import java.awt.Graphics2D;
 
-import Charges.Charge;
-import Charges.Charge.Particle;
+import FieldElements.Charge;
+import FieldElements.Charge.Particle;
 import Util.Util;
 import Util.Vector;
 
 public class ElectricField {
-	private Frame frame;
+	public static final int xStep = 50;
+	public static final int yStep = 50;
+	
 	private Simulation simulation;
 	
-	public ElectricField(Frame frame, Simulation simulation) {
-		this.frame = frame;
+	private Vector[][] vectors;
+	
+	public ElectricField(Simulation simulation) {
 		this.simulation = simulation;
+		
+		vectors = new Vector[(Window.width / xStep) + 1][(Window.height / yStep) + 1];
+		
+		for(int x = 0; x < vectors.length; x++) {
+			for(int y = 0; y < vectors[0].length; y++) {
+				Vector temp = new Vector();
+				temp.setXPos(x * xStep);
+				temp.setYPos(y * yStep);
+				
+				vectors[x][y] = temp;
+			}
+		}
 	}
 	
 	public void render(Graphics2D g2d) {
-		for(int x = 0; x < frame.getWidth(); x += 40) {
-			for(int y = 0; y < frame.getHeight(); y += 40) {
+		for(Vector[] vects : vectors) {
+			for(Vector v : vects) {
 				double xComp = 0;
 				double yComp = 0;
 				
 				for(Charge c : simulation.getCharges()) {
-					Vector vector = Util.getForceVector(x, y, c);
+					Vector vector = Util.getForceVector(v.getXPos(), v.getYPos(), c);
 					
 					if(c.getParticle() == Particle.Proton) {
 						xComp -= vector.getXComp();
@@ -34,13 +49,11 @@ public class ElectricField {
 					}
 				} 
 				
-				Vector vector = new Vector(x, y);
-				
 				double angle = Util.getPosAngle(new Vector(0, 0, xComp, yComp));
-				vector.setMagnitude(15);
-				vector.setAngle(angle);
+				v.setMagnitude(15);
+				v.setAngle(angle);
 				
-				vector.renderArrow(g2d);
+				v.renderArrow(g2d);
 			}
 		}
 	}

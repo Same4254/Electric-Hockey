@@ -10,7 +10,7 @@ import java.awt.geom.Line2D;
 import javax.swing.JFrame;
 import javax.swing.JPanel;
 
-import Charges.Charge;
+import FieldElements.Charge;
 
 public class Util {
 	public static float getPosAngle(Vector vector) {
@@ -31,20 +31,29 @@ public class Util {
 		return angle;
 	}
 	
+	public static float getPosAngle(double x1, double y1, double x2, double y2) {
+		float angle = (float) Math.toDegrees(Math.atan2(x2 - x1, y2 - y1));
+		angle -= 90;
+		
+		if(angle < 0)
+			angle += 360;
+		return angle;
+	}
+	
 	public static double calculateForce(Charge charge1, Charge charge2) {
-		return calculateForce(charge1.getRectangle().getX(), charge1.getRectangle().getY(), charge2.getRectangle().getX(), charge2.getRectangle().getY());
+		return calculateForce(charge1.getRectangle().getCenterX(), charge1.getRectangle().getCenterY(), charge2.getRectangle().getCenterX(), charge2.getRectangle().getCenterY());
 	}
 	
 	public static double calculateForce(double x1, double y1, double x2, double y2) {
 //		System.out.println(((1.6 * Math.pow(10, -19) * 1.6 * Math.pow(10, -19) * 8.99 * Math.pow(10, 9)) / Math.pow(distance(x1, y1, x2, y2), 2) * Math.pow(10, 28)));
 //		System.out.println(1 / Math.pow(distance(x1, y1, x2, y2), 2));
 		
-		return ((1.6 * Math.pow(10, -19) * 1.6 * Math.pow(10, -19) * 8.99 * Math.pow(10, 9)) / Math.pow(distance(x1, y1, x2, y2), 2) * Math.pow(10, 28));
+		return ((1.6 * Math.pow(10, -19) * 1.6 * Math.pow(10, -19) * 8.99 * Math.pow(10, 9)) / Math.pow(distance(x1, y1, x2, y2), 2)) * Charge.forceScale;
 	}
 	
 	public static double distance(double x1, double y1, double x2, double y2) {
 		return Math.sqrt(Math.pow(x2 - x1, 2) + 
-				 Math.pow((y2 - y1), 2));
+						 Math.pow(y2 - y1, 2));
 	}
 	
 	public static Vector getForceVector(Charge charge1, Charge charge2) {
@@ -63,7 +72,16 @@ public class Util {
 		return force;
 	}
 	
-	public static void main(String[] args) {
-		calculateForce(100, 100, 200, 200);
+	public static Vector getForceVector(double x1, double y1, double x2, double y2) {
+		Vector force = new Vector();
+		
+		force.setMagnitude(Util.calculateForce(x1, y1, x2, y2));
+		
+		force.setXPos(x1);
+		force.setYPos(y1);
+		
+		force.setAngle(getPosAngle(x1, y1, x2, y2));
+		
+		return force;
 	}
 }

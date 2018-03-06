@@ -1,4 +1,4 @@
-package Charges;
+package FieldElements;
 
 import java.awt.Color;
 import java.awt.Graphics2D;
@@ -10,7 +10,12 @@ import Main.Simulation;
 import Util.Util;
 import Util.Vector;
 
-public class Charge extends MouseAdapter {
+public class Charge {
+	public static double forceScale = Math.pow(10, 28);
+	public static double velocityScale = 1500; 
+	
+	public static int chargeRadius = 10;
+	
 	public static enum Particle {
 		Proton(1), Electron(-1);
 		
@@ -34,10 +39,7 @@ public class Charge extends MouseAdapter {
 		this.simulation = simulation;
 		this.particle = particle;
 		
-		rectangle = new Rectangle2D.Double(0, 0, 20, 20);
-		
-		simulation.getFrame().addMouseListener(this);
-		simulation.getFrame().addMouseMotionListener(this);
+		rectangle = new Rectangle2D.Double(0, 0, chargeRadius * 2, chargeRadius * 2);
 	}
 	
 	public Charge(Simulation simulation, Particle particle, double x, double y) {
@@ -47,34 +49,65 @@ public class Charge extends MouseAdapter {
 		setY(y);
 	}
 	
-	public void update() {
+	public void update(double delta) {
 		for(Charge charge : simulation.getCharges()) {
 			if(charge != this) {
 				Vector force = Util.getForceVector(this, charge);
 				
-				if(force.getMagnitude() > .001)
-					continue;
-				
-				double scale = 2000;
-				
 				if(charge.getParticle().getValue() == particle.getValue())
 					force.multiply(-1);
 				
-				velX += force.getXComp() * scale;
-				velY -= force.getYComp() * scale;
+				velX += force.getXComp() * delta * velocityScale;
+				velY -= force.getYComp() * delta * velocityScale;
 			} 
 		}
+//		System.out.println("----------------------");	
+		
+//		double forceX = 0;
+//		double forceY = 0;
+//		
+//		for(Charge charge : simulation.getCharges()) {
+//			if(charge != this) {
+//				Vector vector = getCenter();
+//				vector.setMagnitude(Util.calculateForce(this, charge));
+//				vector.setAngle(charge.getCenter());
+//				
+////				 System.out.println("Angle: " + Util.getPosAngle(getCenter(), charge.getCenter()));
+//				
+//				if(charge.getParticle().getValue() == particle.getValue())
+//					vector.multiply(-1);
+//				
+////				if(vector.getMagnitude() > 0.01)
+////					continue;
+//				
+////				System.out.println("----");
+////				System.out.println(charge.getParticle());
+////				System.out.println(vector.getXComp() * delta * velocityScale);
+////				System.out.println(vector.getYComp() * delta * velocityScale);
+//				
+//				forceX += vector.getXComp() * delta * velocityScale;
+//				forceY -= vector.getYComp() * delta * velocityScale;
+//			}
+//		}
+		
+//		System.out.println("--------");
+//		System.out.println("Vel X: " + velX + ", Vel Y: " + velY);
+//		System.out.println(forceX * delta * velocityScale);
+//		System.out.println(forceY * delta * velocityScale);
+//		
+//		velX += forceX * delta * velocityScale;
+//		velY +=	forceY * delta * velocityScale;
 		
 		setX(getRectangle().getX() + velX);
 		setY(getRectangle().getY() + velY);
 		
 		if(rectangle.intersects(simulation.getGoal())) {
-			simulation.stop();
+			simulation.setRunning(false);
 			System.out.println("WIN!");
 		} else {
-			for(Rectangle2D.Double rect : simulation.getColliders()) {
-				if(rectangle.intersects(rect)) {
-					simulation.stop();
+			for(Collider collider : simulation.getColliders()) {
+				if(rectangle.intersects(collider.getRectangle())) {
+					simulation.setRunning(false);
 					System.out.println("Lose");
 				}
 			}
@@ -84,10 +117,14 @@ public class Charge extends MouseAdapter {
 	public void render(Graphics2D g2d) {
 		if(particle == Particle.Proton) {
 			g2d.setColor(Color.BLUE);
-			g2d.fill(rectangle);
+//			g2d.fill(rectangle);
+			
+			g2d.fillOval((int) rectangle.getX(), (int) rectangle.getY(), chargeRadius * 2, chargeRadius * 2);
 		} else {
 			g2d.setColor(Color.RED);
-			g2d.fill(rectangle);
+//			g2d.fill(rectangle);
+			
+			g2d.fillOval((int) rectangle.getX(), (int) rectangle.getY(), chargeRadius * 2, chargeRadius * 2);
 		}
 		
 		g2d.setColor(Color.BLACK);
@@ -95,7 +132,7 @@ public class Charge extends MouseAdapter {
 		for(Charge charge : simulation.getCharges()) {
 			if(charge != this) {
 				Vector vector = getCenter();
-				vector.setMagnitude(Math.min(50, Util.calculateForce(this, charge) * 1000000));
+				vector.setMagnitude(Math.min(75, Util.calculateForce(this, charge) * 60000));
 				vector.setAngle(charge.getCenter());
 				
 				if(charge.getParticle().getValue() == particle.getValue())

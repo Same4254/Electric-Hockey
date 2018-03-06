@@ -37,15 +37,10 @@ public class Vector {
 		setYComp(yComp);
 	}
 	
-	public void multiply(double num) {
-		setXComp(xComp * num);
-		setYComp(yComp * num);
-	}
-	
 	public void render(Graphics2D g2d) {
 		g2d.setStroke(new BasicStroke(3));
 		
-//		g2d.drawLine((int) xPos, (int) yPos, (int) (xPos + xComp), (int) (yPos - yComp));
+		g2d.drawLine((int) xPos, (int) yPos, (int) (xPos + xComp), (int) (yPos - yComp));
 		
 //		g2d.drawRect((int) (xPos - 5), (int) (yPos - 5), 10, 10);
 	}
@@ -95,6 +90,18 @@ public class Vector {
 		magnitude = Math.sqrt((xComp * xComp) + (yComp * yComp));
 		angle = Util.getPosAngle(this);
 	}
+	
+	public void multiply(double num) {
+		setXComp(xComp * num);
+		setYComp(yComp * num);
+	}
+	
+	public void add(Vector add) { setXComp(xComp + add.xComp); setYComp(yComp + add.yComp); }
+	
+	public double distance(Vector distance) { return Math.sqrt(Math.pow(xComp - distance.xComp, 2) + 
+																 Math.pow(yComp - distance.yComp, 2)); }
+	
+	public double distanceSquared(Vector distance) { return Math.pow(distance(distance), 2); }
 	
 	public Color getColor() { return color; }
 	public void setColor(Color color) { this.color = color; }
