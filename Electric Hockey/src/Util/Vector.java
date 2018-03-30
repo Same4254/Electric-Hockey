@@ -91,12 +91,26 @@ public class Vector {
 		angle = Util.getPosAngle(this);
 	}
 	
-	public void multiply(double num) {
-		setXComp(xComp * num);
-		setYComp(yComp * num);
+	public Vector multiply(double num) {
+//		setXComp(xComp * num);
+//		setYComp(yComp * num);
+		
+		return new Vector(xPos, yPos, xComp * num, yComp * num);
 	}
 	
-	public void add(Vector add) { setXComp(xComp + add.xComp); setYComp(yComp + add.yComp); }
+	public Vector multiply(double numX, double numY) {
+//		setXComp(xComp * numX);
+//		setYComp(yComp * numY);
+		
+		return new Vector(xPos, yPos, xComp * numX, yComp * numY);
+	}
+	
+	public Vector pow(double pow) {
+		return new Vector(xPos, yPos, Math.pow(xComp, pow), Math.pow(yComp, pow));
+	}
+	
+	public Vector add(Vector add) { return new Vector(xPos, yPos, xComp + add.getXComp(), yComp + add.getYComp()); } //setXComp(xComp + add.xComp); setYComp(yComp + add.yComp); }
+	public Vector add(double x, double y) { return add(new Vector(0, 0, x, y)); }
 	
 	public double distance(Vector distance) { return Math.sqrt(Math.pow(xComp - distance.xComp, 2) + 
 																 Math.pow(yComp - distance.yComp, 2)); }

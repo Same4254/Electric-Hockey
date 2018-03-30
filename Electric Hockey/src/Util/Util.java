@@ -1,15 +1,5 @@
 package Util;
 
-import java.awt.Color;
-import java.awt.Graphics;
-import java.awt.Graphics2D;
-import java.awt.Point;
-import java.awt.RenderingHints;
-import java.awt.geom.Line2D;
-
-import javax.swing.JFrame;
-import javax.swing.JPanel;
-
 import FieldElements.Charge;
 
 public class Util {
@@ -48,7 +38,7 @@ public class Util {
 //		System.out.println(((1.6 * Math.pow(10, -19) * 1.6 * Math.pow(10, -19) * 8.99 * Math.pow(10, 9)) / Math.pow(distance(x1, y1, x2, y2), 2) * Math.pow(10, 28)));
 //		System.out.println(1 / Math.pow(distance(x1, y1, x2, y2), 2));
 		
-		return ((1.6 * Math.pow(10, -19) * 1.6 * Math.pow(10, -19) * 8.99 * Math.pow(10, 9)) / Math.pow(distance(x1, y1, x2, y2), 2)) * Charge.forceScale;
+		return (1 / Math.pow(distance(x1, y1, x2, y2), 2)) * Charge.forceScale; //((1.6 * Math.pow(10, -19) * 1.6 * Math.pow(10, -19) * 8.99 * Math.pow(10, 9)) / Math.pow(distance(x1, y1, x2, y2), 2)) * Charge.forceScale;
 	}
 	
 	public static double distance(double x1, double y1, double x2, double y2) {
@@ -70,6 +60,16 @@ public class Util {
 		force.setAngle(charge.getCenter());
 		
 		return force;
+	}
+	
+	public static double capBothDirections(double num, double cap) {
+		double sign = Math.copySign(1, num);
+		
+		return Math.min(Math.abs(num), cap) * sign;
+	}
+	
+	public static Vector capBothDirections(Vector vector, double cap) {
+		return new Vector(vector.getXPos(), vector.getYPos(), capBothDirections(vector.getXComp(), cap), capBothDirections(vector.getYComp(), cap));
 	}
 	
 	public static Vector getForceVector(double x1, double y1, double x2, double y2) {

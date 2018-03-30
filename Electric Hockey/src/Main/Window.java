@@ -28,7 +28,6 @@ public class Window extends JPanel implements Runnable {
 		frame = new JFrame("Electric Hockey");
 		frame.setLayout(new BorderLayout());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
-
 		
 //		frame.setSize(width, height);
 //		simulation = new Simulation();

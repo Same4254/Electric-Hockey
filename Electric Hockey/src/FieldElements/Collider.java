@@ -66,19 +66,31 @@ public class Collider {
 	}
 	
 	public void mouseDragged(LevelDesignerValuesPanel valuePanel, MouseEvent e) {
-		
+		if(e.getButton() == MouseEvent.BUTTON1) {
+			System.out.println("Here");
+		}
 	}
 	
 	public void mouseMoved(LevelDesignerValuesPanel valuePanel, MouseEvent e) {
-		
+		if(LevelDesigner.editCollider == this) {
+			setOriginX(e.getX() - rectangle.getWidth() / 2);
+			setOriginY(e.getY() - rectangle.getHeight() / 2);
+		}
 	}
 	
 	public void mouseReleased(LevelDesignerValuesPanel valuePanel, MouseEvent e) {
 		if(rectangle.contains(e.getPoint())) {
-			LevelDesigner.editCollider = this;
-			
-			if(valuePanel != null) 
-				valuePanel.changeCollider(this);
+			if(LevelDesigner.editCollider == null) {
+				LevelDesigner.editCollider = this;
+				
+				if(valuePanel != null) 
+					valuePanel.changeCollider(this);
+			} else {
+				LevelDesigner.editCollider = null;
+				
+				if(valuePanel != null) 
+					valuePanel.changeCollider(null);
+			}
 		}
 	}
 	

@@ -56,15 +56,21 @@ public class LevelViewPanel extends JPanel {
 		}
 		
 		public void mouseDragged(MouseEvent e) {
-			if(level != null)
+			if(level != null) {
 				for(Charge charge : level.getSimulation().getCharges())
 					charge.mouseDragged(e);
+				for(Collider collider : level.getSimulation().getColliders()) 
+					collider.mouseDragged(valuePanel, e);
+			}
 		}
 		
 		public void mouseMoved(MouseEvent e) {
-			if(level != null)
+			if(level != null) {
 				for(Charge charge : level.getSimulation().getCharges())
 					charge.mouseMoved(e);
+				for(Collider collider : level.getSimulation().getColliders()) 
+					collider.mouseMoved(valuePanel, e);
+			}
 		}
 		
 		public void mouseReleased(MouseEvent e) {

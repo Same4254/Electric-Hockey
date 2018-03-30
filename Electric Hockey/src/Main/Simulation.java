@@ -56,6 +56,14 @@ public class Simulation {
 		
 		g2d.fill(goal);
 	}
+	
+	public void reset() {
+		for(Charge c : charges) {
+			c.reset();
+		}
+		
+		running = false;
+	}
 
 	public boolean isRunning() { return running; }
 	public void setRunning(boolean running) { this.running = running; }

@@ -330,19 +330,30 @@ public class LevelDesignerValuesPanel extends JPanel {
 		btnReset.addActionListener(new ActionListener() {
 			@Override
 			public void actionPerformed(ActionEvent e) {
-				System.out.println("Reset");
+				viewPanel.getLevel().getSimulation().reset();
+				btnStart.setText("Start");
 			}
 		});
 	}
 
 	public void changeCollider(Collider collider) {
-		xStepField.setText(Double.toString(collider.getxStep()));
-		yStepField.setText(Double.toString(collider.getyStep()));
-		yMinField.setText(Double.toString(collider.getyMin()));
-		yMaxField.setText(Double.toString(collider.getyMax()));
-		xMinField.setText(Double.toString(collider.getxMin()));
-		xMaxField.setText(Double.toString(collider.getxMax()));
-		angleRateField.setText(Double.toString(collider.getAngleRate()));
+		if(collider == null) {
+			xStepField.setText("0.0");
+			yStepField.setText("0.0");
+			yMinField.setText("0.0");
+			yMaxField.setText("0.0");
+			xMinField.setText("0.0");
+			xMaxField.setText("0.0");
+			angleRateField.setText("0.0");
+		} else {
+			xStepField.setText(Double.toString(collider.getxStep()));
+			yStepField.setText(Double.toString(collider.getyStep()));
+			yMinField.setText(Double.toString(collider.getyMin()));
+			yMaxField.setText(Double.toString(collider.getyMax()));
+			xMinField.setText(Double.toString(collider.getxMin()));
+			xMaxField.setText(Double.toString(collider.getxMax()));
+			angleRateField.setText(Double.toString(collider.getAngleRate()));
+		}
 	}
 	
 	private double getValue(JTextField textField) {
