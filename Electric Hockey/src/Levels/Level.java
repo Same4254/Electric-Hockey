@@ -49,20 +49,20 @@ public class Level implements KeyListener {
 		}
 		
 		if(e.getKeyCode() == KeyEvent.VK_E) {
-			if(Charge.currentMoving == null) {
+			if(Charge.currentDragging == null) {
 				Charge charge = new Charge(simulation, Particle.Electron);
 				
 				simulation.addCharge(charge);
-				Charge.currentMoving = charge;
+				Charge.currentDragging = charge;
 			}
 		}
 		
 		if(e.getKeyCode() == KeyEvent.VK_P) {
-			if(Charge.currentMoving == null) {
+			if(Charge.currentDragging == null) {
 				Charge charge = new Charge(simulation, Particle.Proton);
 				
 				simulation.addCharge(charge);
-				Charge.currentMoving = charge;
+				Charge.currentDragging = charge;
 			}
 		}
 	}

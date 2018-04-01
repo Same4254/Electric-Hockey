@@ -39,6 +39,9 @@ public class Simulation {
 	public void update(double delta) {
 		if(running) {
 			charges.get(0).update(delta);
+//			for(Charge c : charges) {
+//				c.update(delta);
+//			}
 		
 			for(Collider collider : colliders)
 				collider.update(delta);

@@ -6,13 +6,11 @@ import java.awt.event.MouseEvent;
 import java.awt.geom.Rectangle2D;
 
 import Main.Simulation;
-import Util.Util;
-import Util.Vector;
+import Util.Arrow;
+import Util.Force;
 
 public class Charge {
-	public static double forceScale = 400000;//Math.pow(10, 28);
-	public static double velocityScale = .1; 
-	
+	public static double forceFactor = 1500; 
 	public static int chargeRadius = 10;
 	
 	public static enum Particle {
@@ -26,23 +24,25 @@ public class Charge {
 		public int getValue() { return value; }
 	}
 	
-	public static Charge currentMoving;
+	public static Charge currentDragging;
 	
 	private Simulation simulation;
 	private Rectangle2D.Double rectangle;
 	private Particle particle;
-	
-//	private Vector velocity;
-	private double velX;
-	private double velY;
-	
+
+	private Force netForce;
 	private double originX, originY;
+	private double xBefore, yBefore;
+	private boolean starting;
+	private double mass;
 
 	public Charge(Simulation simulation, Particle particle) {
 		this.simulation = simulation;
 		this.particle = particle;
 
 		rectangle = new Rectangle2D.Double(0, 0, chargeRadius * 2, chargeRadius * 2);
+		mass = 25;
+		starting = true;
 	}
 	
 	public Charge(Simulation simulation, Particle particle, double x, double y) {
@@ -56,22 +56,8 @@ public class Charge {
 	}
 	
 	public void update(double delta) {
-		for(Charge charge : simulation.getCharges()) {
-			if(charge != this) {
-				Vector force = Util.getForceVector(this, charge);
-				
-				if(charge.getParticle().getValue() == particle.getValue())
-					force = force.multiply(-1);
-				
-				force = Util.capBothDirections(force, 200);
-				
-				velX += force.getXComp();
-				velY += force.getYComp();
-			} 
-		}
-		
-		setX(getRectangle().getX() + (velX * velocityScale * delta));
-		setY(getRectangle().getY() - (velY * velocityScale * delta));
+		updateNetForce();
+		updatePosition(delta);
 		
 		if(rectangle.intersects(simulation.getGoal())) {
 			simulation.setRunning(false);
@@ -87,51 +73,80 @@ public class Charge {
 	}
 	
 	public void render(Graphics2D g2d) {
-		if(particle == Particle.Proton) {
+		if(particle == Particle.Proton)
 			g2d.setColor(Color.BLUE);
-//			g2d.fill(rectangle);
-			
-			g2d.fillOval((int) rectangle.getX(), (int) rectangle.getY(), chargeRadius * 2, chargeRadius * 2);
-		} else {
+		else
 			g2d.setColor(Color.RED);
-//			g2d.fill(rectangle);
-			
-			g2d.fillOval((int) rectangle.getX(), (int) rectangle.getY(), chargeRadius * 2, chargeRadius * 2);
-		}
 		
+		g2d.fillOval((int) rectangle.getX(), (int) rectangle.getY(), chargeRadius * 2, chargeRadius * 2);
+
 		g2d.setColor(Color.BLACK);
 		
 		for(Charge charge : simulation.getCharges()) {
 			if(charge != this) {
-				Vector vector = getCenter();
-				vector.setMagnitude(Math.min(75, Util.calculateForce(this, charge)));
-				vector.setAngle(charge.getCenter());
+				Force force = new Force(this, charge);
+
+				Arrow arrow = new Arrow((int) force.magnitude());
+				arrow.setAngle(force.getAngle());
+				arrow.setPosition(getCenterX(), getCenterY());
 				
-				if(charge.getParticle().getValue() == particle.getValue())
-					vector.multiply(-1);
-				
-				g2d.setColor(Color.GREEN);
-				vector.render(g2d);
+				arrow.render(g2d, true);
 			}
 		}
+	}
+	
+	public void updateNetForce() {
+		Force netForce = new Force(0, 0);
 		
-		g2d.setColor(Color.BLACK);
+		for(Charge charge : simulation.getCharges()) {
+			if(charge != this) {
+				Force localForce = new Force(this, charge);
+				netForce = netForce.add(localForce);
+			} 
+		}
+		
+		this.netForce = netForce;
+	}
+	
+	private void updatePosition(double delta) {
+		if(this.starting) {
+			xBefore = getX();
+			yBefore = getY();
+
+			addX(forceFactor * netForce.getXComp() / (2.0 * mass) * delta * delta);
+			addY(forceFactor * netForce.getYComp() / (2.0 * mass) * delta * delta);
+
+			starting = false;
+		} else {
+			double xTemp = getX();
+			double yTemp = getY();
+
+			setX((2.0 * getX() - this.xBefore + forceFactor * netForce.getXComp() / mass * delta * delta));
+			setY((2.0 * getY() - this.yBefore + forceFactor * netForce.getYComp() / mass * delta * delta));
+
+			xBefore = xTemp;
+			yBefore = yTemp;
+		}
 	}
 	
 	public void reset() {
 		setX(originX);
 		setY(originY);
 		
-		velX = 0;
-		velY = 0;
+		starting = true;
 	}
 	
+	public double getCenterX() { return rectangle.getCenterX(); }
+	public double getCenterY() { return rectangle.getCenterY(); }
+	
 	public Rectangle2D getRectangle() { return rectangle; }
-	public Vector getCenter() { return new Vector(rectangle.getCenterX(), rectangle.getCenterY()); }
 	public Particle getParticle() { return particle; }
 	
 	public double getOriginX() { return originX; }
 	public double getOriginY() { return originY; }
+	
+	public double getX() { return rectangle.getX(); }
+	public double getY() { return rectangle.getY(); }
 
 	public void setOriginX(double originX) { this.originX = originX; }
 	public void setOriginY(double originY) { this.originY = originY; }
@@ -143,16 +158,16 @@ public class Charge {
 	public void mouseDragged(MouseEvent e) {}
 	
 	public void mouseMoved(MouseEvent e) {
-		if(currentMoving == this) {
+		if(currentDragging == this) {
 			setX(e.getX() - rectangle.getWidth() / 2);
 			setY(e.getY() - rectangle.getHeight() / 2);
 		}
 	}
 	
 	public void mouseReleased(MouseEvent e) {
-		if(currentMoving == null && rectangle.contains(e.getPoint())) 
-			currentMoving = this;
-		else if(currentMoving != null && currentMoving == this)
-			currentMoving = null;
+		if(currentDragging == null && rectangle.contains(e.getPoint())) 
+			currentDragging = this;
+		else if(currentDragging != null && currentDragging == this)
+			currentDragging = null;
 	}
 }
