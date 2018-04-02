@@ -19,9 +19,6 @@ public class Window extends JPanel implements Runnable {
 	private Thread thread;
 	private boolean running;
 	
-//	private Simulation simulation;
-//	
-//	private Collider collider;
 	LevelDesigner levelDesigner;
 	
 	public Window() {
@@ -29,32 +26,6 @@ public class Window extends JPanel implements Runnable {
 		frame.setLayout(new BorderLayout());
 		frame.setDefaultCloseOperation(JFrame.EXIT_ON_CLOSE);
 		
-//		frame.setSize(width, height);
-//		simulation = new Simulation();
-//		collider = new Collider();
-//		
-//		collider.setOriginX(100);
-//		collider.setOriginY(100);
-//		
-//		collider.setxMax(50);
-//		collider.setxMin(50);
-//
-//		collider.setyMax(50);
-//		collider.setyMin(50);
-//		
-//		collider.setxStep(-100);
-//		collider.setyStep(-100);
-//		
-////		collider.setAngleRate(10);
-//
-//		collider.setWidth(20);
-//		collider.setHeight(20);
-		
-//		System.out.println("Collider Center X: " + collider.getRectangle().getCenterX());
-//		System.out.println("Collider Center Y: " + collider.getRectangle().getCenterY());
-		
-//		frame.addKeyListener(simulation);
-
 		levelDesigner = new LevelDesigner(this);
 		
 		setLayout(new BorderLayout());
@@ -72,14 +43,9 @@ public class Window extends JPanel implements Runnable {
 	public void paintComponent(Graphics g) {
 		Graphics2D g2d = (Graphics2D) g;
 		g2d.clearRect(0, 0, getWidth(), getHeight());
-		
-//		simulation.render(g2d);
-//		collider.render(g2d);
 	}
 	
 	public void update(double delta) {
-//		simulation.update(delta);
-//		collider.update(delta);
 		levelDesigner.update(delta);
 	}
 	
